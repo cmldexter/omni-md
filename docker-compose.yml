@@ -1,0 +1,54 @@
+version: '3.8'
+
+networks:
+  omni_net:
+    driver: bridge
+
+volumes:
+  omni_db_data:
+    description: "Persistent storage for the md-relay-worker SQLite WAL database and config states"
+
+services:
+  omni-console:
+    build:
+      context: ./omni-console
+      dockerfile: Dockerfile
+    container_name: omni-console
+    ports:
+      - "5173:80"
+    networks:
+      - omni_net
+    restart: unless-stopped
+    security_opt:
+      - no-new-privileges:true
+    depends_on:
+      md-relay-worker:
+        condition: service_healthy
+
+  md-relay-worker:
+    build:
+      context: ./md-relay-worker
+      dockerfile: Dockerfile
+    container_name: md-relay-worker
+    ports:
+      - "8080:8080"
+    networks:
+      - omni_net
+    restart: unless-stopped
+    volumes:
+      # Isolated sub-mount resolving any host-permission clashes natively
+      - omni_db_data:/app/data
+    environment:
+      - DATABASE_URL=sqlite:///app/data/omni.db
+      - RUST_LOG=info
+    healthcheck:
+      # Leverage the built-in Axum Kubernetes Liveness probe to gate deployments natively
+      test: ["CMD", "curl", "-f", "http://127.0.0.1:8080/api/health/liveness"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+      start_period: 5s
+    security_opt:
+      - no-new-privileges:true
+    # NOTE: The container was compiled inherently targeting the 'genome' user. 
+    # Attempting to `exec` as root will inherently fail downstream privilege escalations.

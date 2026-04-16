@@ -1,0 +1,35 @@
+# Node/Vite (Frontend)
+omni-console/node_modules/
+omni-console/dist/
+omni-console/dist-ssr/
+omni-console/.eslintcache
+omni-console/npm-debug.log*
+omni-console/yarn-debug.log*
+omni-console/yarn-error.log*
+
+# Rust/Cargo (Backend)
+md-relay-worker/target/
+md-relay-worker/Cargo.lock
+
+# Database & Environment
+*.db
+*.sqlite
+*.sqlite3
+*.db-journal
+*.db-wal
+*.db-shm
+.env
+.env.*
+
+# OS generated files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# Omni-MD local sync tmp workspaces
+tmp_sync_*/
+tmp_sync/

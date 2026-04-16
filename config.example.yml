@@ -1,0 +1,36 @@
+# ===================================================================
+# Omni-MD Configuration
+# Heavily optimized for GitLab Webhooks and Wiki.js Storage Syncing
+# ===================================================================
+
+config:
+  # The host/port the worker will listen on for GitLab Webhooks
+  listen_port: 8080
+  listen_host: "0.0.0.0"
+  
+  # The Master Wiki.js Storage Repository
+  target_repo: "git@gitlab.com:my-company/wiki-storage.git"
+  target_branch: "master"
+
+sync:
+  # -----------------------------------------------------
+  # Service: Backend API (GitLab to Wiki.js mapping)
+  # -----------------------------------------------------
+  - source_repo: "git@gitlab.com:engineering/backend-api.git"
+    source_branch: "main"
+    mappings:
+      # Automatically sync everything from the repo's internal docs/ folder 
+      # straight into the Wiki.js /engineering/api/ namespace
+      - src: "docs/architecture/"
+        dest: "engineering/api/architecture/"
+      - src: "README.md"
+        dest: "engineering/api/home.md"
+
+  # -----------------------------------------------------
+  # Service: Frontend App (GitLab to Wiki.js mapping)
+  # -----------------------------------------------------
+  - source_repo: "git@gitlab.com:engineering/frontend-portal.git"
+    source_branch: "main"
+    mappings:
+      - src: "docs/components/"
+        dest: "engineering/frontend/components/"
